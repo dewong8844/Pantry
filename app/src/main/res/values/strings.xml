@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Pantry</string>
+    <string name="show_inventory">Show Inventory</string>
+    <string name="show_products">Show Products</string>
+    <string name="scan">Scan</string>
+    <string name="simple_scanner_activity">Scan a Product Barcode</string>
+</resources>
+
