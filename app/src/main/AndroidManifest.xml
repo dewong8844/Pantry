@@ -25,12 +25,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".scanner.BarcodeScannerActivity"
+        <activity
+            android:name=".scanner.BarcodeScannerActivity"
             android:label="@string/simple_scanner_activity"
-            android:theme="@style/AppOverlayTheme">
-        </activity>
+            android:theme="@style/AppOverlayTheme"></activity>
         <activity android:name=".scanner.BaseScannerActivity" />
-
+        <activity android:name=".InventoryActivity"></activity>
     </application>
 
 </manifest>

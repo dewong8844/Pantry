@@ -64,14 +64,14 @@ public class PantryContract {
         static final String COLUMN_DATA = "data";
     }
 
-    static final class InventoryEntry implements BaseColumns {
-        static final String TABLE_NAME = "Inventory";
+    public static final class InventoryEntry implements BaseColumns {
+        public static final String TABLE_NAME = "Inventory";
 
-        static final String COLUMN_INVENTORY_ID = "inventory_id";
-        static final String COLUMN_PRODUCT_ID = "product_id";
-        static final String COLUMN_LOCATION = "location";
-        static final String COLUMN_QUANTITY = "quantity";
-        static final String COLUMN_EXPIRATION_DATE = "expiration_date";
+        public static final String COLUMN_INVENTORY_ID = "inventory_id";
+        public static final String COLUMN_PRODUCT_ID = "product_id";
+        public static final String COLUMN_LOCATION = "location";
+        public static final String COLUMN_QUANTITY = "quantity";
+        public static final String COLUMN_EXPIRATION_DATE = "expiration_date";
     }
 
     static final class LocationsEntry implements BaseColumns {

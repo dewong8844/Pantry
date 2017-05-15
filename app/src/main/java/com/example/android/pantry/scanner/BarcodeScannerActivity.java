@@ -27,6 +27,10 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
  *
  * Uses ZXing, https://github.com/zxing/zxing (License Apache 2.0)
  *
+ * NOTE: this article recommands ZXing but also mentions ZBar and Google Mobile Vision
+ * https://medium.com/@bherbst/android-barcode-scanning-library-landscape-109292b81b65
+ *
+ * Google Mobile Vision: https://github.com/googlesamples/android-vision.git
  */
 public class BarcodeScannerActivity extends BaseScannerActivity implements MessageDialogFragment.MessageDialogListener,
         ZXingScannerView.ResultHandler, FormatSelectorDialogFragment.FormatSelectorDialogListener,
