@@ -9,7 +9,6 @@ import android.util.Log;
 import com.example.android.pantry.data.Inventory;
 import com.example.android.pantry.data.PantryContract;
 import com.example.android.pantry.data.PantryDbHelper;
-import com.example.android.pantry.data.Product;
 
 public class InventoryActivity extends AppCompatActivity {
     private SQLiteDatabase mDb;

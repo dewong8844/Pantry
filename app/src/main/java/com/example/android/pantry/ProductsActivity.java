@@ -1,47 +1,48 @@
 package com.example.android.pantry;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.Toast;
 
-import com.example.android.pantry.data.PantryContract;
-import com.example.android.pantry.data.PantryDbHelper;
-import com.example.android.pantry.data.Product;
 
-public class ProductsActivity extends AppCompatActivity {
+public class ProductsActivity extends AppCompatActivity implements ProductsAdapter.ProductsAdapterOnClickHandler {
 
-    private SQLiteDatabase mDb;
+    private ProductsAdapter mAdapter;
+    private RecyclerView mProductList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_products);
 
-        PantryDbHelper dbHelper = new PantryDbHelper(this);
-        mDb = dbHelper.getWritableDatabase();
+         // set up recycler view
+        mProductList = (RecyclerView) findViewById(R.id.product_list);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mProductList.setLayoutManager(layoutManager);
+        mProductList.setHasFixedSize(true);
 
-        // saveProductToDb(mDb, "Kong Yen", "rice vinegar", 20.2f, "FL OZ", "vinegar", "grocery");
+        mAdapter = new ProductsAdapter(this, this);
+        mProductList.setAdapter(mAdapter);
 
-        // get all products, populate the recycler view
-        Product product = new Product();
-        Cursor cursor = product.getAllProducts(mDb);
-        int count = cursor.getCount();
-        Log.i(this.toString(), "Found " + count + " products.");
-        for (int i=0; i < count; i++) {
-            if (!cursor.moveToPosition(i)) continue;
-            String brand = cursor.getString(cursor.getColumnIndex(PantryContract.ProductsEntry.COLUMN_BRAND));
-            String name = cursor.getString(cursor.getColumnIndex(PantryContract.ProductsEntry.COLUMN_NAME));
-            Log.i(this.toString(), "Prod brand: " + brand + ", name: " + name);
-        }
     }
 
     @Override
     protected void onDestroy() {
-        mDb.close();
+        // TODO: find new place to close DB
+        // mDb.close();
         super.onDestroy();
     }
 
+    @Override
+    public void onClick(String productDetail) {
+        Context context = this;
+        Toast.makeText(context, productDetail, Toast.LENGTH_SHORT)
+                .show();
+
+    }
 }

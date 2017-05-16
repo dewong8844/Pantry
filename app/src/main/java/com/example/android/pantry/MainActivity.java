@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Called when user taps the Show Inventory button
     public void startInventoryActivity(View view) {
-        Log.e("TAG", "Show Inventory not implemented yet!");
+        Intent intent = new Intent(this, InventoryActivity.class);
+        startActivity(intent);
     }
 
     public void launchActivity(Class<?> clss) {
