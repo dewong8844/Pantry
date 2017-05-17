@@ -1,4 +1,4 @@
-package com.example.android.pantry.data;
+package com.example.android.pantry.dataStore;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -103,7 +103,7 @@ public class PantryDbHelper extends SQLiteOpenHelper {
                 PantryContract.InventoryEntry.COLUMN_PRODUCT_ID +
                     " INTEGER REFERENCES Products(product_id), " +
                 PantryContract.InventoryEntry.COLUMN_LOCATION +
-                    " INTEGER REFERENCES Locations(desc), " +
+                    " NVARCHAR(40) REFERENCES Locations(desc), " +
                 PantryContract.InventoryEntry.COLUMN_QUANTITY +  " NVARCHAR(40), " +
                 PantryContract.InventoryEntry.COLUMN_EXPIRATION_DATE + " TEXT " +  // TIMESTAMP
                 ");";

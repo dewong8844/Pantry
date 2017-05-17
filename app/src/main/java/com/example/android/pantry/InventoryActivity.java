@@ -1,39 +1,43 @@
 package com.example.android.pantry;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
 
-import com.example.android.pantry.data.Inventory;
-import com.example.android.pantry.data.PantryContract;
-import com.example.android.pantry.data.PantryDbHelper;
+public class InventoryActivity extends AppCompatActivity implements InventoryAdapter.InventoryAdapterOnClickHandler {
 
-public class InventoryActivity extends AppCompatActivity {
-    private SQLiteDatabase mDb;
+    private InventoryAdapter mAdapter;
+    private RecyclerView mProductList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory);
 
-        PantryDbHelper dbHelper = new PantryDbHelper(this);
-        mDb = dbHelper.getWritableDatabase();
+        // set up recycler view
+        mProductList = (RecyclerView) findViewById(R.id.rv_inventory);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mProductList.setLayoutManager(layoutManager);
+        mProductList.setHasFixedSize(true);
 
-        // saveProductToDb(mDb, "Kong Yen", "rice vinegar", 20.2f, "FL OZ", "vinegar", "grocery");
+        mAdapter = new InventoryAdapter(this, this);
+        mProductList.setAdapter(mAdapter);
+    }
 
-        // get all products, populate the recycler view
-        Inventory inventory = new Inventory();
-        Cursor cursor = inventory.getInventory(mDb);
-        int count = cursor.getCount();
-        Log.i(this.toString(), "Found " + count + " products.");
-        for (int i=0; i < count; i++) {
-            if (!cursor.moveToPosition(i)) continue;
-            String productId = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_PRODUCT_ID));
-            String quantity = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_QUANTITY));
-            Log.i(this.toString(), "Prod id: " + productId + ", quantity: " + quantity);
-        }
+    @Override
+    protected void onDestroy() {
+        // TODO: find new place to close DB
+        // mDb.close();
+        super.onDestroy();
+    }
 
+    @Override
+    public void onClick(String inventoryItemInfo) {
+        Context context = this;
+        Toast.makeText(context, inventoryItemInfo, Toast.LENGTH_SHORT)
+                .show();
     }
 }

@@ -1,17 +1,20 @@
-package com.example.android.pantry.data;
+package com.example.android.pantry.dataStore;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.example.android.pantry.model.Product;
+
 /**
  * Created by dewong4 on 5/14/17.
  */
 
-public class ProductList {
+public class ProductsTable {
+    private static final String TAG = ProductsTable.class.getSimpleName();
 
-    public Cursor getAllProducts(SQLiteDatabase db) {
+    public static Cursor getAllProducts(SQLiteDatabase db) {
         return db.query(
                 PantryContract.ProductsEntry.TABLE_NAME,
                 null,
@@ -23,10 +26,10 @@ public class ProductList {
         );
     }
 
-    public Product getProduct(SQLiteDatabase db, int productId) {
+    public static Product getProduct(SQLiteDatabase db, long productId) {
         String selection =
                 PantryContract.ProductsEntry.COLUMN_PRODUCT_ID + " = ?";
-         String[] selectionArgs = { Integer.toString(productId) };
+         String[] selectionArgs = { Long.toString(productId) };
 
         Cursor cursor = db.query(
                 PantryContract.ProductsEntry.TABLE_NAME,
@@ -53,12 +56,8 @@ public class ProductList {
         return product;
     }
 
-    private boolean productExists(SQLiteDatabase db, String brand, String name, double amount) {
-        String[] projection = {
-                PantryContract.ProductsEntry.COLUMN_BRAND,
-                PantryContract.ProductsEntry.COLUMN_NAME,
-                PantryContract.ProductsEntry.COLUMN_AMOUNT
-        };
+    public static long getProductIdByName(SQLiteDatabase db, String brand, String name, double amount) {
+        String[] projection = { PantryContract.ProductsEntry.COLUMN_PRODUCT_ID };
         String selection =
                 PantryContract.ProductsEntry.COLUMN_BRAND + "=?" + " AND " +
                         PantryContract.ProductsEntry.COLUMN_NAME + "=?" + " AND " +
@@ -75,10 +74,14 @@ public class ProductList {
                 PantryContract.ProductsEntry.COLUMN_PRODUCT_ID
         );
 
-        return (cursor.getCount() >= 1);   // TODO: what if there is more than 1 ?
+        if (cursor.getCount() == 0) return 0;
+
+        cursor.moveToFirst();
+        long productId = cursor.getInt(cursor.getColumnIndex(PantryContract.ProductsEntry.COLUMN_PRODUCT_ID));
+        return productId;
     }
 
-    public long saveToDb(SQLiteDatabase db, String brand, String name,
+    public static long saveToDb(SQLiteDatabase db, String brand, String name,
                                 double amount, String unit,
                                 String ingredient, String category) {
 
@@ -90,7 +93,8 @@ public class ProductList {
         cv.put(PantryContract.ProductsEntry.COLUMN_INGREDIENT, ingredient);
         cv.put(PantryContract.ProductsEntry.COLUMN_CATEGORY, category);
 
-        if (productExists(db, brand, name, amount)) {
+        long productId = getProductIdByName(db, brand, name, amount);
+        if (productId != 0) {
             // update the product in db
             String selection =
                     PantryContract.ProductsEntry.COLUMN_BRAND + "=?" + " AND " +
@@ -98,10 +102,11 @@ public class ProductList {
                             PantryContract.ProductsEntry.COLUMN_AMOUNT + "=?";
             String[] selectionArgs = { brand, name, Double.toString(amount) };
 
-            Log.i(this.toString() + " saveProductToDb() ", ", updated brand: " + brand +
+            Log.i(TAG + " saveProductToDb() ", ", updated brand: " + brand +
                     " name: " + name);
 
-            return db.update(
+            int count;
+            count = db.update(
                     PantryContract.ProductsEntry.TABLE_NAME,
                     cv,
                     selection,
@@ -110,12 +115,13 @@ public class ProductList {
 
         } else {
             // insert new product into the db
-            Log.i(this.toString() + " saveProductToDb() ", ", inserted brand: " + brand +
+            Log.i(TAG + " saveProductToDb() ", ", inserted brand: " + brand +
                     " name: " + name);
 
-            return db.insert(PantryContract.ProductsEntry.TABLE_NAME, null, cv);
-
+            productId =  db.insert(PantryContract.ProductsEntry.TABLE_NAME, null, cv);
         }
+
+        return productId;
     }
 
 }

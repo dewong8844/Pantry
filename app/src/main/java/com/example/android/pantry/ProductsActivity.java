@@ -21,7 +21,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsAdapt
         setContentView(R.layout.activity_products);
 
          // set up recycler view
-        mProductList = (RecyclerView) findViewById(R.id.product_list);
+        mProductList = (RecyclerView) findViewById(R.id.rv_product_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mProductList.setLayoutManager(layoutManager);
         mProductList.setHasFixedSize(true);

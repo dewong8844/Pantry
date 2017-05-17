@@ -1,4 +1,4 @@
-package com.example.android.pantry.data;
+package com.example.android.pantry.dataStore;
 
 import android.provider.BaseColumns;
 
@@ -61,11 +61,11 @@ public class PantryContract {
         static final String COLUMN_IMAGE_ID = "image_id";
         static final String COLUMN_PRODUCT_ID = "product_id";
         static final String COLUMN_TYPE = "type";
-        static final String COLUMN_DATA = "data";
+        static final String COLUMN_DATA = "dataStore";
     }
 
     public static final class InventoryEntry implements BaseColumns {
-        public static final String TABLE_NAME = "Inventory";
+        public static final String TABLE_NAME = "InventoryTable";
 
         public static final String COLUMN_INVENTORY_ID = "inventory_id";
         public static final String COLUMN_PRODUCT_ID = "product_id";

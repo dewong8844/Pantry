@@ -1,4 +1,4 @@
-package com.example.android.pantry.data;
+package com.example.android.pantry.model;
 
 /**
  * Created by dewong4 on 5/16/17.

@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    // Called when user taps the Show Inventory button
+    // Called when user taps the Show InventoryTable button
     public void startInventoryActivity(View view) {
         Intent intent = new Intent(this, InventoryActivity.class);
         startActivity(intent);
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 } else {
-                    Toast.makeText(this, "Please grant camera permission to use the Barcode Scanner", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Please grant camera permission to use the BarcodesTable Scanner", Toast.LENGTH_SHORT).show();
                 }
                 return;
         }

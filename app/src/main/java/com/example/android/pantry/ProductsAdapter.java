@@ -10,10 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.android.pantry.data.PantryContract;
-import com.example.android.pantry.data.PantryDbHelper;
-import com.example.android.pantry.data.ProductList;
-import com.example.android.pantry.data.Product;
+import com.example.android.pantry.dataStore.PantryDbHelper;
+import com.example.android.pantry.dataStore.ProductsTable;
+import com.example.android.pantry.model.Product;
 
 /**
  * Created by dewong4 on 5/15/17.
@@ -44,13 +43,12 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
         mDb = dbHelper.getWritableDatabase();
 
         // get all products, populate the recycler view
-        ProductList product = new ProductList();
 
-        // product.saveToDb(mDb, "Kong Yen", "rice vinegar", 20.2, "FL OZ", "vinegar", "grocery");
-        // product.saveToDb(mDb, "Kraft", "A1 sauce", 15.0, "OZ", "a1 sauce", "grocery");
-        // product.saveToDb(mDb, "Advil", "Ibuprofen", 360.0, "tablet", "ibuprofen", "drug");
+        // ProductsTable.saveToDb(mDb, "Kong Yen", "rice vinegar", 20.2, "FL OZ", "vinegar", "grocery");
+        // ProductsTable.saveToDb(mDb, "Kraft", "A1 sauce", 15.0, "OZ", "a1 sauce", "grocery");
+        // ProductsTable.saveToDb(mDb, "Advil", "Ibuprofen", 360.0, "tablet", "ibuprofen", "drug");
 
-        Cursor cursor = product.getAllProducts(mDb);
+        Cursor cursor = ProductsTable.getAllProducts(mDb);
         int count = cursor.getCount();
         mNumberItems = count;
         Log.i(this.toString(), "Found " + count + " products.");
@@ -104,8 +102,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
         }
 
         public void bind(int listIndex) {
-            ProductList productList = new ProductList();
-            Product product = productList.getProduct(mDb, listIndex + 1);
+            Product product = ProductsTable.getProduct(mDb, listIndex + 1);
             if (product == null) {
                 itemBrandView.setText(String.valueOf(listIndex));
                 return;
@@ -123,8 +120,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            ProductList productList = new ProductList();
-            Product product = productList.getProduct(mDb, adapterPosition + 1);
+            Product product = ProductsTable.getProduct(mDb, adapterPosition + 1);
             if (product == null) {
                 // don't call onClick() callback
                 return;
