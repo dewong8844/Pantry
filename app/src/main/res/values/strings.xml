@@ -4,6 +4,8 @@
     <string name="show_products">Show Products</string>
     <string name="scan">Scan</string>
     <string name="simple_scanner_activity">Scan a Product Barcode</string>
+    <string name="inventory_activity">Inventory</string>
+    <string name="products_activity">Products</string>
     <string name="flash_on">Flash [ON]</string>
     <string name="flash_off">Flash [OFF]</string>
     <string name="auto_focus_on">Auto Focus [ON]</string>

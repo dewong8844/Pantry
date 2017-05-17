@@ -41,13 +41,13 @@ public class BarcodesTable {
         String[] selectionArgs = { value };
 
         Cursor cursor = db.query(
-                PantryContract.InventoryEntry.TABLE_NAME,
+                PantryContract.BarcodesEntry.TABLE_NAME,
                 null,
                 selection,
                 selectionArgs,
                 null,
                 null,
-                PantryContract.ProductsEntry.COLUMN_PRODUCT_ID
+                PantryContract.BarcodesEntry.COLUMN_BARCODE_ID
         );
 
         if (cursor.getCount() == 0) return null;

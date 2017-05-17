@@ -1,5 +1,6 @@
 package com.example.android.pantry.scanner;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -10,8 +11,12 @@ import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.util.Log;
 
 import com.example.android.pantry.R;
+import com.example.android.pantry.dataStore.BarcodesTable;
+import com.example.android.pantry.dataStore.PantryDbHelper;
+import com.example.android.pantry.model.Barcode;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 
@@ -35,6 +40,8 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 public class BarcodeScannerActivity extends BaseScannerActivity implements MessageDialogFragment.MessageDialogListener,
         ZXingScannerView.ResultHandler, FormatSelectorDialogFragment.FormatSelectorDialogListener,
         CameraSelectorDialogFragment.CameraSelectorDialogListener {
+    private static final String TAG = BarcodeScannerActivity.class.getSimpleName();
+
     private static final String FLASH_STATE = "FLASH_STATE";
     private static final String AUTO_FOCUS_STATE = "AUTO_FOCUS_STATE";
     private static final String SELECTED_FORMATS = "SELECTED_FORMATS";
@@ -156,8 +163,24 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
             Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
             r.play();
-        } catch (Exception e) {}
-        showMessageDialog("Contents = " + rawResult.getText() + ", Format = " + rawResult.getBarcodeFormat().toString());
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+            e.printStackTrace();
+        }
+
+        String barcodeValue = rawResult.getText();
+        PantryDbHelper dbHelper = new PantryDbHelper(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Barcode barcode = BarcodesTable.getBarcodeByValue(db, barcodeValue);
+        String productInfo = null;
+        if (barcode == null) {
+            productInfo = "No product info available at this time";
+        } else {
+            productInfo = barcode.getProduct().getBrand() + " " + barcode.getProduct().getName();
+        }
+        showMessageDialog("Contents = " + rawResult.getText() + ", Format = " + rawResult.getBarcodeFormat().toString() +
+                ", Product = " + productInfo);
+        db.close();
     }
 
     public void showMessageDialog(String message) {
