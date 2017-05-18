@@ -44,7 +44,7 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Inve
         // set up DB to use products table
         PantryDbHelper dbHelper = new PantryDbHelper(context);
         mDb = dbHelper.getWritableDatabase();
-
+/*
         //TODO: begin move this block to test code
         long productId = 0;
 
@@ -59,7 +59,8 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Inve
         productId = ProductsTable.saveToDb(mDb, "Advil", "Ibuprofen", 360.0, "tablet", "ibuprofen", "drug");
         InventoryTable.saveToDb(mDb, productId, "medicine cabinet", 1, "2019-May-31");
         BarcodesTable.saveToDb(mDb, "305730154604", "UPC_A", productId);
-
+    // TODO: end move this block to test code
+    */
         Cursor cursor = InventoryTable.getInventory(mDb);
         int count = cursor.getCount();
         mNumberItems = count;
@@ -72,7 +73,8 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Inve
             String location = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_LOCATION));
             Log.i(TAG, i + ", id: " + inventoryId + ", location "+ location + ", quantity: " + quantity);
         }
-        // TODO: end move this block to test code
+
+
     }
 
     @Override

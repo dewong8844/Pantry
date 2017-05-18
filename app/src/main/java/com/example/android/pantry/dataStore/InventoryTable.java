@@ -58,6 +58,36 @@ public class InventoryTable {
         return new InventoryItem(inventoryId, location, quantity, expiration, product);
     }
 
+    public static InventoryItem getInventoryItemByProductId(SQLiteDatabase db, long productId) {
+        String selection =
+                PantryContract.InventoryEntry.COLUMN_PRODUCT_ID + " = ?";
+        String[] selectionArgs = { Long.toString(productId) };
+
+        Cursor cursor = db.query(
+                PantryContract.InventoryEntry.TABLE_NAME,
+                null,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                PantryContract.InventoryEntry.COLUMN_INVENTORY_ID
+        );
+
+        if (cursor.getCount() == 0) return null;
+        cursor.moveToFirst();
+
+        // use productId to query the product
+        long inventoryId = cursor.getLong(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_INVENTORY_ID));
+        Product product = ProductsTable.getProduct(db, productId);
+        if (product == null) return null;
+
+        String location = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_LOCATION));
+        int quantity = cursor.getInt(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_QUANTITY));
+        String expiration = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_EXPIRATION_DATE));
+
+        return new InventoryItem(inventoryId, location, quantity, expiration, product);
+    }
+
     private static long getInventoryIdByProductId(SQLiteDatabase db, long productId) {
         String[] projection = {
                 PantryContract.InventoryEntry.COLUMN_INVENTORY_ID

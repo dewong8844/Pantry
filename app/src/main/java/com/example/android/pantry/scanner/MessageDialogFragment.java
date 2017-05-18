@@ -14,7 +14,9 @@ import com.example.android.pantry.R;
 
 public class MessageDialogFragment extends DialogFragment {
     public interface MessageDialogListener {
-        public void onDialogPositiveClick(android.support.v4.app.DialogFragment dialog);
+        public void onDialogAddClick(DialogFragment dialog);
+        public void onDialogRemoveClick(DialogFragment dialog);
+        public void onDialogCancelClick(DialogFragment dialog);
     }
 
     private String mTitle;
@@ -40,11 +42,29 @@ public class MessageDialogFragment extends DialogFragment {
         builder.setMessage(mMessage)
                 .setTitle(mTitle);
 
-        builder.setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.add_button, new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int id) {
                 if(mListener != null) {
-                    mListener.onDialogPositiveClick(MessageDialogFragment.this);
+                    mListener.onDialogAddClick(MessageDialogFragment.this);
+                }
+            }
+        });
+
+        builder.setNeutralButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int id) {
+                if(mListener != null) {
+                    mListener.onDialogCancelClick(MessageDialogFragment.this);
+                }
+            }
+        });
+
+        builder.setNegativeButton(R.string.remove_button, new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int id) {
+                if(mListener != null) {
+                    mListener.onDialogRemoveClick(MessageDialogFragment.this);
                 }
             }
         });

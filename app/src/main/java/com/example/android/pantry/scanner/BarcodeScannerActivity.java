@@ -15,8 +15,10 @@ import android.util.Log;
 
 import com.example.android.pantry.R;
 import com.example.android.pantry.dataStore.BarcodesTable;
+import com.example.android.pantry.dataStore.InventoryTable;
 import com.example.android.pantry.dataStore.PantryDbHelper;
 import com.example.android.pantry.model.Barcode;
+import com.example.android.pantry.model.InventoryItem;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 
@@ -51,6 +53,9 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
     private boolean mAutoFocus;
     private ArrayList<Integer> mSelectedIndices;
     private int mCameraId = -1;
+
+    private SQLiteDatabase mDb;
+    private InventoryItem mLastInventoryItem;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -170,17 +175,26 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
 
         String barcodeValue = rawResult.getText();
         PantryDbHelper dbHelper = new PantryDbHelper(this);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Barcode barcode = BarcodesTable.getBarcodeByValue(db, barcodeValue);
-        String productInfo = null;
+        mDb = dbHelper.getWritableDatabase();
+        Barcode barcode = BarcodesTable.getBarcodeByValue(mDb, barcodeValue);
+
+
+        String productInfo = "";
+        String quantityString = "";
         if (barcode == null) {
             productInfo = "No product info available at this time";
         } else {
             productInfo = barcode.getProduct().getBrand() + " " + barcode.getProduct().getName();
+            long productId = barcode.getProduct().getProductId();
+            InventoryItem item = InventoryTable.getInventoryItemByProductId(mDb, productId);
+            quantityString = "\nYou have = " + item.getQuantity() + " of it.";
+
+            // save a copy for inventory update
+            mLastInventoryItem = item;
         }
-        showMessageDialog("Contents = " + rawResult.getText() + ", Format = " + rawResult.getBarcodeFormat().toString() +
-                ", Product = " + productInfo);
-        db.close();
+        showMessageDialog("Barcode = " + rawResult.getText() + " (" + rawResult.getBarcodeFormat().toString() + ")" +
+                "\nProduct = " + productInfo + " " + quantityString);
+
     }
 
     public void showMessageDialog(String message) {
@@ -205,7 +219,35 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
     }
 
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
+    public void onDialogAddClick(DialogFragment dialog) {
+        // Update the inventory DB
+        if (mLastInventoryItem != null) {
+            InventoryTable.saveToDb(mDb, mLastInventoryItem.getProductInfo().getProductId(),
+                    mLastInventoryItem.getLocation(), mLastInventoryItem.getQuantity() + 1,
+                    mLastInventoryItem.getExpirationDate());
+        }
+        mDb.close();
+        // Resume the camera
+        mScannerView.resumeCameraPreview(this);
+    }
+
+    @Override
+    public void onDialogRemoveClick(DialogFragment dialog) {
+        // Update the inventory DB
+        if (mLastInventoryItem != null && mLastInventoryItem.getQuantity() > 0) {
+            InventoryTable.saveToDb(mDb, mLastInventoryItem.getProductInfo().getProductId(),
+                    mLastInventoryItem.getLocation(), mLastInventoryItem.getQuantity() - 1,
+                    mLastInventoryItem.getExpirationDate());
+        }
+        mDb.close();
+        // Resume the camera
+        mScannerView.resumeCameraPreview(this);
+    }
+
+    @Override
+    public void onDialogCancelClick(DialogFragment dialog) {
+        // Nothing to do, close DB
+        mDb.close();
         // Resume the camera
         mScannerView.resumeCameraPreview(this);
     }

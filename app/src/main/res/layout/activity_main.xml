@@ -9,7 +9,7 @@
 
     <Button
         android:id="@+id/scan"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"
         android:layout_marginRight="32dp"
@@ -18,11 +18,13 @@
         android:text="@string/scan"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp" />
 
     <Button
         android:id="@+id/products"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"
         android:layout_marginRight="32dp"
@@ -31,11 +33,13 @@
         android:text="@string/show_products"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scan" />
+        app:layout_constraintTop_toBottomOf="@+id/scan"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp" />
 
     <Button
         android:id="@+id/inventoryTable"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"
         android:layout_marginRight="32dp"
@@ -44,5 +48,7 @@
         android:text="@string/show_inventory"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/products" />
+        app:layout_constraintTop_toBottomOf="@+id/products"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp" />
 </android.support.constraint.ConstraintLayout>
