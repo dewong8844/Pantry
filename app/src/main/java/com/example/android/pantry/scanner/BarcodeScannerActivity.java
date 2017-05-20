@@ -176,13 +176,14 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
         String barcodeValue = rawResult.getText();
         PantryDbHelper dbHelper = new PantryDbHelper(this);
         mDb = dbHelper.getWritableDatabase();
-        Barcode barcode = BarcodesTable.getBarcodeByValue(mDb, barcodeValue);
-
 
         String productInfo = "";
         String quantityString = "";
+        mLastInventoryItem = null;
+
+        Barcode barcode = BarcodesTable.getBarcodeByValue(mDb, barcodeValue);
         if (barcode == null) {
-            productInfo = "No product info available at this time";
+            productInfo = "information not available";
         } else {
             productInfo = barcode.getProduct().getBrand() + " " + barcode.getProduct().getName();
             long productId = barcode.getProduct().getProductId();
