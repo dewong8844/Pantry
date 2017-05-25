@@ -1,13 +1,16 @@
 package com.example.android.pantry.scanner;
 
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -17,11 +20,16 @@ import com.example.android.pantry.R;
 import com.example.android.pantry.dataStore.BarcodesTable;
 import com.example.android.pantry.dataStore.InventoryTable;
 import com.example.android.pantry.dataStore.PantryDbHelper;
+import com.example.android.pantry.dataStore.ProductsTable;
 import com.example.android.pantry.model.Barcode;
 import com.example.android.pantry.model.InventoryItem;
+import com.example.android.pantry.model.Product;
+import com.example.android.pantry.utilities.NetworkUtils;
+import com.example.android.pantry.utilities.PantryJsonUtils;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +49,8 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
  */
 public class BarcodeScannerActivity extends BaseScannerActivity implements MessageDialogFragment.MessageDialogListener,
         ZXingScannerView.ResultHandler, FormatSelectorDialogFragment.FormatSelectorDialogListener,
-        CameraSelectorDialogFragment.CameraSelectorDialogListener {
+        CameraSelectorDialogFragment.CameraSelectorDialogListener,
+        SearchDialogFragment.SearchDialogListener {
     private static final String TAG = BarcodeScannerActivity.class.getSimpleName();
 
     private static final String FLASH_STATE = "FLASH_STATE";
@@ -56,6 +65,9 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
 
     private SQLiteDatabase mDb;
     private InventoryItem mLastInventoryItem;
+
+    private String mLastBarcodeValue;
+    private String mLastBarcodeType;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -80,6 +92,9 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
         setupFormats();
         contentFrame.addView(mScannerView);
     }
+
+
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -173,7 +188,8 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
             e.printStackTrace();
         }
 
-        String barcodeValue = rawResult.getText();
+        mLastBarcodeValue = rawResult.getText();
+        mLastBarcodeType = rawResult.getBarcodeFormat().toString();
         PantryDbHelper dbHelper = new PantryDbHelper(this);
         mDb = dbHelper.getWritableDatabase();
 
@@ -181,26 +197,45 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
         String quantityString = "";
         mLastInventoryItem = null;
 
-        Barcode barcode = BarcodesTable.getBarcodeByValue(mDb, barcodeValue);
+        Barcode barcode = BarcodesTable.getBarcodeByValue(mDb, mLastBarcodeValue);
         if (barcode == null) {
-            productInfo = "information not available";
+            String message = "Search the big product database?";
+
+            showSearchDialog(message);
+
         } else {
             productInfo = barcode.getProduct().getBrand() + " " + barcode.getProduct().getName();
             long productId = barcode.getProduct().getProductId();
             InventoryItem item = InventoryTable.getInventoryItemByProductId(mDb, productId);
-            quantityString = "\nYou have = " + item.getQuantity() + " of it.";
+            String quantity = "0";
+            if (item != null) {
+                quantity = String.valueOf(item.getQuantity());
+            } else {
+                // if known product, create new inventory item and fill entries
+                if ( barcode.getProduct().isKnownProduct() ) {
+                    // TODO: how to enter initial value for location and expiration date??
+                    item = new InventoryItem(0, "pantry", 0, "2017-Dec-31", barcode.getProduct());
+                }
+            }
+            quantityString = "\nYou have = " + quantity + " of it.";
 
             // save a copy for inventory update
             mLastInventoryItem = item;
+
+            showMessageDialog("Barcode = " + mLastBarcodeValue + " (" + mLastBarcodeType + ")" +
+                    "\nProduct = " + productInfo + " " + quantityString);
         }
-        showMessageDialog("Barcode = " + rawResult.getText() + " (" + rawResult.getBarcodeFormat().toString() + ")" +
-                "\nProduct = " + productInfo + " " + quantityString);
 
     }
 
     public void showMessageDialog(String message) {
         DialogFragment fragment = MessageDialogFragment.newInstance("Scan Results", message, this);
-        fragment.show(getSupportFragmentManager(), "scan_results");
+        fragment.show(getSupportFragmentManager(), "search_request");
+    }
+
+    public void showSearchDialog(String message) {
+        DialogFragment fragment = SearchDialogFragment.newInstance("External Search", message, this);
+        fragment.show(getSupportFragmentManager(), "search_request");
     }
 
     public void closeMessageDialog() {
@@ -246,6 +281,22 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
     }
 
     @Override
+    public void onDialogNotSearchClick(DialogFragment dialog) {
+        // Search for product on the web service
+        // Nothing to do, close DB
+        mDb.close();
+        // Resume the camera
+        mScannerView.resumeCameraPreview(this);
+    }
+
+    @Override
+    public void onDialogSearchClick(DialogFragment dialog) {
+        // don't close DB, will close after search result
+        new ExternalDbSearchTask().execute(mLastBarcodeValue);
+        // show request progress view
+    }
+
+    @Override
     public void onDialogCancelClick(DialogFragment dialog) {
         // Nothing to do, close DB
         mDb.close();
@@ -288,5 +339,60 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
     protected void onPause() {
         super.onPause();
         mScannerView.stopCamera();
+    }
+
+    public class ExternalDbSearchTask extends AsyncTask<String, Void, Product> {
+
+        @Override
+        protected Product doInBackground(String... barcodes) {
+            try {
+                URL searchBarcodeUrl = NetworkUtils.buildUrlBarcodeQueryByValue(barcodes[0]);
+                String jsonBarcodeData = NetworkUtils.getResponseFromHttpUrl(searchBarcodeUrl);
+                long productId = PantryJsonUtils.getProductIdFromBarcodeJson(jsonBarcodeData);
+                if (productId == 0) return null;
+
+                URL searchProductUrl = NetworkUtils.buildUrlProductQueryById(String.valueOf(productId));
+                String jsonProductData = NetworkUtils.getResponseFromHttpUrl(searchProductUrl);
+                Product product = PantryJsonUtils.getProductFromJson(jsonProductData);
+                return product;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Product product) {
+            String quantityString = "";
+            String productInfo = "";
+            // insert product in DB
+            if (product != null) {
+                long productId = ProductsTable.saveToDb(mDb, product.getBrand(),
+                        product.getName(),
+                        product.getAmount(),
+                        product.getUnit(),
+                        product.getIngredient(),
+                        product.getCategory());
+                productInfo = product.getBrand() + " " + product.getName();
+                BarcodesTable.saveToDb(mDb, mLastBarcodeValue, mLastBarcodeType, productId);
+                InventoryItem item = InventoryTable.getInventoryItemByProductId(mDb, productId);
+                String quantity = "0";
+                if (item != null) {
+                    quantity = String.valueOf(item.getQuantity());
+                }
+                quantityString = "\nYou have = " + quantity + " of it.";
+
+                // save a copy for inventory update
+                mLastInventoryItem = item;
+
+            } else {
+                productInfo = "No product information.";
+            }
+
+            // mDb handle kept open after network search
+            mDb.close();
+            showMessageDialog("Barcode = " + mLastBarcodeValue + " (" + mLastBarcodeType + ")" +
+                    "\nProduct = " + productInfo + " " + quantityString);
+        }
     }
 }

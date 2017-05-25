@@ -2,18 +2,25 @@ package com.example.android.pantry;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.android.pantry.scanner.BarcodeScannerActivity;
+import com.example.android.pantry.utilities.NetworkUtils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private static final String TAG = MainActivity.class.getSimpleName();
     private static final int ZXING_CAMERA_PERMISSION = 1;
     private Class<?> mClss;
 
@@ -21,8 +28,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
+        setupSharedPreferences();
     }
 
     // Called when user taps the Scan button
@@ -52,7 +58,24 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, clss);
             startActivity(intent);
         }
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.settings, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent startSettingsAcitivity = new Intent(this, SettingsActivity.class);
+            startActivity(startSettingsAcitivity);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -68,6 +91,32 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, "Please grant camera permission to use the BarcodesTable Scanner", Toast.LENGTH_SHORT).show();
                 }
                 return;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this).
+                unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    private void setupSharedPreferences() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        String hostname = sharedPreferences.getString(
+                getString(R.string.pref_hostname_key),
+                getString(R.string.pref_hostname_default));
+        NetworkUtils.setServiceHostname(hostname);
+        Log.i(TAG, "Hostname: " + hostname);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals((getString(R.string.pref_hostname_key)))) {
+            String hostname = sharedPreferences.getString(key, getString(R.string.pref_hostname_default));
+            NetworkUtils.setServiceHostname(hostname);
         }
     }
 }

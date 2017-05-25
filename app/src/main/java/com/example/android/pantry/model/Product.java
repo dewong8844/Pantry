@@ -33,6 +33,8 @@ public class Product {
         this.mProductId = mProductId;
     }
 
+    public boolean isKnownProduct() { return (mProductId != 0); }
+
     public String getBrand() {
         return mBrand;
     }
