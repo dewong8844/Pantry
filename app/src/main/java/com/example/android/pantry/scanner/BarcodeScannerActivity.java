@@ -199,7 +199,7 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
 
         Barcode barcode = BarcodesTable.getBarcodeByValue(mDb, mLastBarcodeValue);
         if (barcode == null) {
-            String message = "Search the big product database?";
+            String message = "Product not found.\nSearch the big product database?";
 
             showSearchDialog(message);
 
@@ -373,12 +373,19 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
                         product.getUnit(),
                         product.getIngredient(),
                         product.getCategory());
+                // set productid from db - there must be a better way
+                product.setProductId((int)productId);
                 productInfo = product.getBrand() + " " + product.getName();
                 BarcodesTable.saveToDb(mDb, mLastBarcodeValue, mLastBarcodeType, productId);
                 InventoryItem item = InventoryTable.getInventoryItemByProductId(mDb, productId);
                 String quantity = "0";
                 if (item != null) {
                     quantity = String.valueOf(item.getQuantity());
+                } else {
+                    // TODO: how to enter initial value for location and expiration date??
+                    Log.v(TAG, "productid: " + product.getProductId() + ", brand: " + product.getBrand() +
+                               ", name: " + product.getBrand());
+                    item = new InventoryItem(0, "pantry", 0, "2017-Dec-31", product);
                 }
                 quantityString = "\nYou have = " + quantity + " of it.";
 
@@ -390,7 +397,7 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
             }
 
             // mDb handle kept open after network search
-            mDb.close();
+            // the mDb handle will be close as part of message dialog
             showMessageDialog("Barcode = " + mLastBarcodeValue + " (" + mLastBarcodeType + ")" +
                     "\nProduct = " + productInfo + " " + quantityString);
         }
