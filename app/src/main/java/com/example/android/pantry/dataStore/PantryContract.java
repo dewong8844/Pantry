@@ -78,7 +78,7 @@ public class PantryContract {
         static final String TABLE_NAME = "Locations";
 
         static final String COLUMN_LOCATION_ID = "location_id";
-        static final String COLUMN_DESCRIPTION_ID = "desc";
+        static final String COLUMN_DESCRIPTION = "desc";
 
     }
 }

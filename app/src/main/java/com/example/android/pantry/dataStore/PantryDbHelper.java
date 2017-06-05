@@ -92,7 +92,7 @@ public class PantryDbHelper extends SQLiteOpenHelper {
                 PantryContract.LocationsEntry.TABLE_NAME + " (" +
                 PantryContract.LocationsEntry.COLUMN_LOCATION_ID +
                     " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                PantryContract.LocationsEntry.COLUMN_DESCRIPTION_ID +  " NVARCHAR(40) " +
+                PantryContract.LocationsEntry.COLUMN_DESCRIPTION +  " NVARCHAR(40) " +
                 ");";
         sqLiteDatabase.execSQL(SQL_CREATE_LOCATIONS_TABLE);
 

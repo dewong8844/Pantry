@@ -19,6 +19,7 @@ import android.util.Log;
 import com.example.android.pantry.R;
 import com.example.android.pantry.dataStore.BarcodesTable;
 import com.example.android.pantry.dataStore.InventoryTable;
+import com.example.android.pantry.dataStore.LocationsTable;
 import com.example.android.pantry.dataStore.PantryDbHelper;
 import com.example.android.pantry.dataStore.ProductsTable;
 import com.example.android.pantry.model.Barcode;
@@ -72,7 +73,7 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
-        if(state != null) {
+        if (state != null) {
             mFlash = state.getBoolean(FLASH_STATE, false);
             mAutoFocus = state.getBoolean(AUTO_FOCUS_STATE, true);
             mSelectedIndices = state.getIntegerArrayList(SELECTED_FORMATS);
@@ -92,7 +93,6 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
         setupFormats();
         contentFrame.addView(mScannerView);
     }
-
 
 
     @Override
@@ -117,7 +117,7 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuItem menuItem;
 
-        if(mFlash) {
+        if (mFlash) {
             menuItem = menu.add(Menu.NONE, R.id.menu_flash, 0, R.string.flash_on);
         } else {
             menuItem = menu.add(Menu.NONE, R.id.menu_flash, 0, R.string.flash_off);
@@ -125,7 +125,7 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
         MenuItemCompat.setShowAsAction(menuItem, MenuItem.SHOW_AS_ACTION_NEVER);
 
 
-        if(mAutoFocus) {
+        if (mAutoFocus) {
             menuItem = menu.add(Menu.NONE, R.id.menu_auto_focus, 0, R.string.auto_focus_on);
         } else {
             menuItem = menu.add(Menu.NONE, R.id.menu_auto_focus, 0, R.string.auto_focus_off);
@@ -147,7 +147,7 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
         switch (item.getItemId()) {
             case R.id.menu_flash:
                 mFlash = !mFlash;
-                if(mFlash) {
+                if (mFlash) {
                     item.setTitle(R.string.flash_on);
                 } else {
                     item.setTitle(R.string.flash_off);
@@ -156,7 +156,7 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
                 return true;
             case R.id.menu_auto_focus:
                 mAutoFocus = !mAutoFocus;
-                if(mAutoFocus) {
+                if (mAutoFocus) {
                     item.setTitle(R.string.auto_focus_on);
                 } else {
                     item.setTitle(R.string.auto_focus_off);
@@ -206,30 +206,43 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
         } else {
             productInfo = barcode.getProduct().getBrand() + " " + barcode.getProduct().getName();
             long productId = barcode.getProduct().getProductId();
+
+            buildInventoryItemAndShowMessageDialog(productInfo, barcode.getProduct(), productId);
+        }
+
+    }
+
+    private void buildInventoryItemAndShowMessageDialog(String productInfo, Product product, long productId) {
+        String quantityString = "";
+        if(product !=null)
+        {
             InventoryItem item = InventoryTable.getInventoryItemByProductId(mDb, productId);
             String quantity = "0";
             if (item != null) {
                 quantity = String.valueOf(item.getQuantity());
             } else {
+                // TODO: how to enter initial value for location and expiration date??
                 // if known product, create new inventory item and fill entries
-                if ( barcode.getProduct().isKnownProduct() ) {
-                    // TODO: how to enter initial value for location and expiration date??
-                    item = new InventoryItem(0, "pantry", 0, "2017-Dec-31", barcode.getProduct());
+                if (product.isKnownProduct()) {
+
+                    Log.v(TAG, "productid: " + product.getProductId() + ", brand: " + product.getBrand() +
+                            ", name: " + product.getBrand());
+                    item = new InventoryItem(0, "pantry", 0, "2017-Dec-31", product);
                 }
             }
             quantityString = "\nYou have = " + quantity + " of it.";
 
             // save a copy for inventory update
             mLastInventoryItem = item;
-
-            showMessageDialog("Barcode = " + mLastBarcodeValue + " (" + mLastBarcodeType + ")" +
-                    "\nProduct = " + productInfo + " " + quantityString);
         }
 
-    }
+        // mDb handle kept open after network search
+        // the mDb handle will be close as part of message dialog
+        String locations[] = LocationsTable.getAllLocations(mDb);
 
-    public void showMessageDialog(String message) {
-        DialogFragment fragment = MessageDialogFragment.newInstance("Scan Results", message, this);
+        String message = "Barcode = "+mLastBarcodeValue +" ("+mLastBarcodeType+")"+
+                "\nProduct = "+productInfo+" "+quantityString;
+        DialogFragment fragment = MessageDialogFragment.newInstance("Scan Results", message, locations, this);
         fragment.show(getSupportFragmentManager(), "search_request");
     }
 
@@ -363,43 +376,26 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
 
         @Override
         protected void onPostExecute(Product product) {
-            String quantityString = "";
+
             String productInfo = "";
+            long productId = 0;
             // insert product in DB
             if (product != null) {
-                long productId = ProductsTable.saveToDb(mDb, product.getBrand(),
+                productId = ProductsTable.saveToDb(mDb, product.getBrand(),
                         product.getName(),
                         product.getAmount(),
                         product.getUnit(),
                         product.getIngredient(),
                         product.getCategory());
-                // set productid from db - there must be a better way
+                // set productid, use new value from local DB, replace value from remote DB
                 product.setProductId((int)productId);
                 productInfo = product.getBrand() + " " + product.getName();
                 BarcodesTable.saveToDb(mDb, mLastBarcodeValue, mLastBarcodeType, productId);
-                InventoryItem item = InventoryTable.getInventoryItemByProductId(mDb, productId);
-                String quantity = "0";
-                if (item != null) {
-                    quantity = String.valueOf(item.getQuantity());
-                } else {
-                    // TODO: how to enter initial value for location and expiration date??
-                    Log.v(TAG, "productid: " + product.getProductId() + ", brand: " + product.getBrand() +
-                               ", name: " + product.getBrand());
-                    item = new InventoryItem(0, "pantry", 0, "2017-Dec-31", product);
-                }
-                quantityString = "\nYou have = " + quantity + " of it.";
-
-                // save a copy for inventory update
-                mLastInventoryItem = item;
-
             } else {
                 productInfo = "No product information.";
             }
 
-            // mDb handle kept open after network search
-            // the mDb handle will be close as part of message dialog
-            showMessageDialog("Barcode = " + mLastBarcodeValue + " (" + mLastBarcodeType + ")" +
-                    "\nProduct = " + productInfo + " " + quantityString);
-        }
+            buildInventoryItemAndShowMessageDialog(productInfo, product, productId);
+         }
     }
 }

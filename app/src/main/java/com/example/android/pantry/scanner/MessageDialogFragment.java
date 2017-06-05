@@ -5,14 +5,25 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.example.android.pantry.R;
+import com.example.android.pantry.dataStore.LocationsTable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by dewong4 on 5/13/17.
  */
 
-public class MessageDialogFragment extends DialogFragment {
+public class MessageDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
     public interface MessageDialogListener {
         public void onDialogAddClick(DialogFragment dialog);
         public void onDialogRemoveClick(DialogFragment dialog);
@@ -21,6 +32,7 @@ public class MessageDialogFragment extends DialogFragment {
 
     private String mTitle;
     private String mMessage;
+    private String[] mLocations;
     private MessageDialogListener mListener;
 
     public void onCreate(Bundle state) {
@@ -28,10 +40,12 @@ public class MessageDialogFragment extends DialogFragment {
         setRetainInstance(true);
     }
 
-    public static MessageDialogFragment newInstance(String title, String message, MessageDialogListener listener) {
+    public static MessageDialogFragment newInstance(String title, String message, String[] locations,
+                                                    MessageDialogListener listener) {
         MessageDialogFragment fragment = new MessageDialogFragment();
         fragment.mTitle = title;
         fragment.mMessage = message;
+        fragment.mLocations = locations;
         fragment.mListener = listener;
         return fragment;
     }
@@ -39,8 +53,22 @@ public class MessageDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(mMessage)
-                .setTitle(mTitle);
+        /*
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        View addInventoryView = inflater.inflate(R.layout.add_inventory, null);
+        TextView messageTextView = (TextView) addInventoryView.findViewById(R.id.tv_message);
+        messageTextView.setText(mMessage);
+
+        Spinner locationsSpinner = (Spinner) addInventoryView.findViewById(R.id.locations_spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_spinner_item, mLocations);
+        locationsSpinner.setAdapter(adapter);
+        */
+
+        builder.setTitle(mTitle)
+                .setMessage(mMessage);
+        //        .setView(addInventoryView);
 
         builder.setPositiveButton(R.string.add_button, new DialogInterface.OnClickListener() {
 
@@ -72,4 +100,13 @@ public class MessageDialogFragment extends DialogFragment {
         return builder.create();
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }

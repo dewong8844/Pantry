@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.example.android.pantry.dataStore.BarcodesTable;
 import com.example.android.pantry.dataStore.InventoryTable;
+import com.example.android.pantry.dataStore.LocationsTable;
 import com.example.android.pantry.dataStore.ProductsTable;
 import com.example.android.pantry.dataStore.PantryDbHelper;
 import com.example.android.pantry.dataStore.PantryContract;
@@ -61,6 +62,10 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Inve
         BarcodesTable.saveToDb(mDb, "305730154604", "UPC_A", productId);
     // TODO: end move this block to test code
     */
+        LocationsTable.saveToDb(mDb, "pantry");
+        LocationsTable.saveToDb(mDb, "fridge");
+        LocationsTable.saveToDb(mDb, "medicine cabinet");
+
         Cursor cursor = InventoryTable.getInventory(mDb);
         int count = cursor.getCount();
         mNumberItems = count;
