@@ -72,6 +72,8 @@ public class PantryContract {
         public static final String COLUMN_LOCATION = "location";
         public static final String COLUMN_QUANTITY = "quantity";
         public static final String COLUMN_EXPIRATION_DATE = "expiration_date";
+        public static final String COLUMN_PURCHASE_DATE = "purchase_date";
+        public static final String COLUMN_PURCHASE_PRICE = "purchase_price";
     }
 
     static final class LocationsEntry implements BaseColumns {

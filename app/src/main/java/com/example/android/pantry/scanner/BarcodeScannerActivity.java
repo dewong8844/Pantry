@@ -227,7 +227,7 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
 
                     Log.v(TAG, "productid: " + product.getProductId() + ", brand: " + product.getBrand() +
                             ", name: " + product.getBrand());
-                    item = new InventoryItem(0, "pantry", 0, "2017-Dec-31", product);
+                    item = new InventoryItem(0, "pantry", 0, "2017-Dec-31", "2017-Aug-29", "22.33", product);
                 }
             }
             quantityString = "\nYou have = " + quantity + " of it.";
@@ -273,7 +273,8 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
         if (mLastInventoryItem != null) {
             InventoryTable.saveToDb(mDb, mLastInventoryItem.getProductInfo().getProductId(),
                     mLastInventoryItem.getLocation(), mLastInventoryItem.getQuantity() + 1,
-                    mLastInventoryItem.getExpirationDate());
+                    mLastInventoryItem.getExpirationDate(), mLastInventoryItem.getPurchaseDate(),
+                    mLastInventoryItem.getPurchasePrice());
         }
         mDb.close();
         // Resume the camera
@@ -286,7 +287,8 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
         if (mLastInventoryItem != null && mLastInventoryItem.getQuantity() > 0) {
             InventoryTable.saveToDb(mDb, mLastInventoryItem.getProductInfo().getProductId(),
                     mLastInventoryItem.getLocation(), mLastInventoryItem.getQuantity() - 1,
-                    mLastInventoryItem.getExpirationDate());
+                    mLastInventoryItem.getExpirationDate(), mLastInventoryItem.getPurchaseDate(),
+                    mLastInventoryItem.getPurchasePrice());
         }
         mDb.close();
         // Resume the camera
