@@ -69,13 +69,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            Intent startSettingsAcitivity = new Intent(this, SettingsActivity.class);
-            startActivity(startSettingsAcitivity);
-            return true;
+        switch(item.getItemId()) {
+            case R.id.action_settings: {
+                Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+                startActivity(startSettingsActivity);
+                return true;
+            }
+            case R.id.action_database: {
+                Intent databaseActivity = new Intent(this, DatabaseActivity.class);
+                startActivity(databaseActivity);
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

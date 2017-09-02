@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,7 +32,7 @@
         <activity
             android:name=".scanner.BarcodeScannerActivity"
             android:label="@string/simple_scanner_activity"
-            android:theme="@style/AppOverlayTheme"></activity>
+            android:theme="@style/AppOverlayTheme" />
         <activity
             android:name=".InventoryActivity"
             android:label="@string/inventory_activity"
@@ -40,13 +41,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".SettingsActivity"
+        <activity
+            android:name=".SettingsActivity"
             android:label="@string/settings_activity"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity android:name=".DatabaseActivity"></activity>
     </application>
 
 </manifest>

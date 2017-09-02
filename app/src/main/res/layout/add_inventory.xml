@@ -2,22 +2,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingLeft="24dp"
+    android:paddingRight="24dp"
+    android:paddingTop="9dp"
+    android:paddingBottom="18dp">
 
     <TextView
         android:id="@+id/tv_message"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="10dp"
-        android:fontFamily="monospace"
         android:textSize="16sp" />
 
     <TextView
         android:id="@+id/tv_locations"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:fontFamily="monospace"
         android:textSize="16sp"
         android:text="Item Locations"/>
 
@@ -31,10 +31,31 @@
         android:id="@+id/tv_expiration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:fontFamily="monospace"
         android:textSize="16sp"
         android:text="Expiration Date: "/>
 
+    <EditText
+        android:id="@+id/et_expire_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:inputType="date"
+        android:textSize="16sp"
+        android:hint="@string/expire_date_hint"/>
 
+    <TextView
+        android:id="@+id/tv_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="Purchase Price: "/>
+
+    <EditText
+        android:id="@+id/et_purchase_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:inputType="date"
+        android:textSize="16sp"
+        android:hint="@string/purch_price_hint"/>
 </LinearLayout>

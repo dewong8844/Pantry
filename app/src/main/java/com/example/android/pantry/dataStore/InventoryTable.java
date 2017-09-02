@@ -53,9 +53,9 @@ public class InventoryTable {
 
         String location = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_LOCATION));
         int quantity = cursor.getInt(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_QUANTITY));
-        String expirationDate = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_EXPIRATION_DATE));
-        String purchaseDate = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_PURCHASE_DATE));
-        String purchasePrice = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_PURCHASE_PRICE));
+        long expirationDate = cursor.getInt(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_EXPIRATION_DATE));
+        long purchaseDate = cursor.getInt(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_PURCHASE_DATE));
+        long purchasePrice = cursor.getInt(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_PURCHASE_PRICE));
 
         return new InventoryItem(inventoryId, location, quantity, expirationDate, purchaseDate, purchasePrice, product);
     }
@@ -85,9 +85,9 @@ public class InventoryTable {
 
         String location = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_LOCATION));
         int quantity = cursor.getInt(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_QUANTITY));
-        String expirationDate = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_EXPIRATION_DATE));
-        String purchaseDate = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_PURCHASE_DATE));
-        String purchasePrice = cursor.getString(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_PURCHASE_PRICE));
+        long expirationDate = cursor.getInt(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_EXPIRATION_DATE));
+        long purchaseDate = cursor.getInt(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_PURCHASE_DATE));
+        long purchasePrice = cursor.getInt(cursor.getColumnIndex(PantryContract.InventoryEntry.COLUMN_PURCHASE_PRICE));
 
         return new InventoryItem(inventoryId, location, quantity, expirationDate, purchaseDate, purchasePrice, product);
     }
@@ -116,8 +116,8 @@ public class InventoryTable {
 
     // TODO: make locationId into string, query location table
     public static long saveToDb(SQLiteDatabase db, long productId, String location,
-                                int quantity, String expirationDate,
-                                String purchaseDate, String purchasePrice) {
+                                int quantity, long expirationDate,
+                                long purchaseDate, long purchasePrice) {
 
         ContentValues cv = new ContentValues();
         cv.put(PantryContract.InventoryEntry.COLUMN_PRODUCT_ID, productId);

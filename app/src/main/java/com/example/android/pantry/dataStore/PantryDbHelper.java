@@ -105,9 +105,9 @@ public class PantryDbHelper extends SQLiteOpenHelper {
                 PantryContract.InventoryEntry.COLUMN_LOCATION +
                     " NVARCHAR(40) REFERENCES Locations(desc), " +
                 PantryContract.InventoryEntry.COLUMN_QUANTITY +  " NVARCHAR(40), " +
-                PantryContract.InventoryEntry.COLUMN_EXPIRATION_DATE + " TEXT, " +  // TIMESTAMP
-                PantryContract.InventoryEntry.COLUMN_PURCHASE_DATE + " TEXT, " +    // TIMESTAMP
-                PantryContract.InventoryEntry.COLUMN_PURCHASE_PRICE + " TEXT " +   // DOUBLE
+                PantryContract.InventoryEntry.COLUMN_EXPIRATION_DATE + " INTEGER, " +  // TIMESTAMP
+                PantryContract.InventoryEntry.COLUMN_PURCHASE_DATE + " INTEGER, " +    // TIMESTAMP
+                PantryContract.InventoryEntry.COLUMN_PURCHASE_PRICE + " INTEGER " +   // DOUBLE
                 ");";
         sqLiteDatabase.execSQL(SQL_CREATE_INVENTORY_TABLE);
 

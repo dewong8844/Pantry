@@ -10,14 +10,14 @@ public class InventoryItem {
     private long mInventoryId;  // set to 0 if id unknown
     private String mLocation;
     private int mQuantity;
-    private String mExpirationDate;
-    private String mPurchaseDate;
-    private String mPurchasePrice;
+    private long mExpirationDate;
+    private long mPurchaseDate;
+    private long mPurchasePrice;
     private Product mProductInfo;
 
     public InventoryItem(long inventoryId, String location, int quantity,
-                         String expirationDate, String purchaseDate,
-                         String purchasePrice, Product productInfo) {
+                         long expirationDate, long purchaseDate,
+                         long purchasePrice, Product productInfo) {
         mInventoryId = inventoryId;
         mLocation = location;
         mQuantity = quantity;
@@ -51,27 +51,27 @@ public class InventoryItem {
         mQuantity = quantity;
     }
 
-    public String getExpirationDate() {
+    public long getExpirationDate() {
         return mExpirationDate;
     }
 
-    public void setExpirationDate(String expirationDate) {
+    public void setExpirationDate(long expirationDate) {
         mExpirationDate = expirationDate;
     }
 
-    public String getPurchaseDate() {
+    public long getPurchaseDate() {
         return mPurchaseDate;
     }
 
-    public void setPurchaseDate(String purchaseDate) {
+    public void setPurchaseDate(long purchaseDate) {
         mPurchaseDate = purchaseDate;
     }
 
-    public String getPurchasePrice() {
+    public long getPurchasePrice() {
         return mPurchasePrice;
     }
 
-    public void setPurchasePrice(String purchasePrice) {
+    public void setPurchasePrice(long purchasePrice) {
         mPurchasePrice = purchasePrice;
     }
 

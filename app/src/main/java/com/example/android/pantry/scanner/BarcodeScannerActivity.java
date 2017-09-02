@@ -214,9 +214,10 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
 
     private void buildInventoryItemAndShowMessageDialog(String productInfo, Product product, long productId) {
         String quantityString = "";
+        InventoryItem item = null;
         if(product !=null)
         {
-            InventoryItem item = InventoryTable.getInventoryItemByProductId(mDb, productId);
+            item = InventoryTable.getInventoryItemByProductId(mDb, productId);
             String quantity = "0";
             if (item != null) {
                 quantity = String.valueOf(item.getQuantity());
@@ -227,8 +228,8 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
 
                     Log.v(TAG, "productid: " + product.getProductId() + ", brand: " + product.getBrand() +
                             ", name: " + product.getBrand());
-                    item = new InventoryItem(0, "pantry", 0, "2017-Dec-31", "2017-Aug-29", "22.33", product);
-                }
+                    item = new InventoryItem(0, "new", 0, 0, 0, 0, product);
+                }               // id, location, quantity, expiration date, purchase date, price, product
             }
             quantityString = "\nYou have = " + quantity + " of it.";
 
@@ -242,7 +243,7 @@ public class BarcodeScannerActivity extends BaseScannerActivity implements Messa
 
         String message = "Barcode = "+mLastBarcodeValue +" ("+mLastBarcodeType+")"+
                 "\nProduct = "+productInfo+" "+quantityString;
-        DialogFragment fragment = MessageDialogFragment.newInstance("Scan Results", message, locations, this);
+        DialogFragment fragment = MessageDialogFragment.newInstance("Scan Results", message, locations, item, this);
         fragment.show(getSupportFragmentManager(), "search_request");
     }
 
