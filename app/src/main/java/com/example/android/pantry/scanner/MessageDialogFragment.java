@@ -67,6 +67,8 @@ public class MessageDialogFragment extends DialogFragment implements AdapterView
     }
 
     final Calendar myCalendar = Calendar.getInstance();
+    // final TimeZone timezone = TimeZone.getDefault();    // specific, use TimeZone.getTimeZone("America/Los_Angeles")
+
 
     private void updateLabel(EditText view) {
         String myFormat = "MM/dd/yyyy"; //In which you need put here
@@ -110,15 +112,16 @@ public class MessageDialogFragment extends DialogFragment implements AdapterView
                 updateLabel(expireDateEditText);
 
                 // TODO: is ther better way to get date?
-                GregorianCalendar gc = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+                GregorianCalendar gc = new GregorianCalendar(TimeZone.getDefault());
                 gc.clear();
-                gc.set(year, monthOfYear-1, dayOfMonth);
+                gc.set(year, monthOfYear, dayOfMonth, 23, 59, 0);
                 Log.d("set expire date: ", "mItem: " + mItem);
                 if (mItem != null) {
                     mItem.setExpirationDate(gc.getTimeInMillis());
                     SimpleDateFormat sdf = new SimpleDateFormat();
-                    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    Log.d("get purchase date: ", sdf.format(new Date(mItem.getExpirationDate())));
+                    sdf.setTimeZone(TimeZone.getDefault());
+                    Log.d("get purchase date: ", sdf.format(new Date(mItem.getPurchaseDate())));
+                    Log.d("get expiration date: ", sdf.format(new Date(mItem.getExpirationDate())));
 
                 }
             }
@@ -139,11 +142,11 @@ public class MessageDialogFragment extends DialogFragment implements AdapterView
             }
         });
 
-        Log.d("set purchase date: ", "mItem: " + mItem);
+        //Log.d("timezone: ", timezone.getDisplayName());
         if (mItem != null) {
             mItem.setPurchaseDate((long)(new Date().getTime()));
             SimpleDateFormat sdf = new SimpleDateFormat();
-            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            sdf.setTimeZone(TimeZone.getDefault());
             Log.d("get purchase date: ", sdf.format(new Date(mItem.getPurchaseDate())));
         }
 

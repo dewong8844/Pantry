@@ -52,19 +52,19 @@ public class InventoryItem {
     }
 
     public long getExpirationDate() {
-        return mExpirationDate;
+        return mExpirationDate*1000; //convert to Java date in milliseconds
     }
 
     public void setExpirationDate(long expirationDate) {
-        mExpirationDate = expirationDate;
+        mExpirationDate = expirationDate/1000; //concert to unix datae
     }
 
     public long getPurchaseDate() {
-        return mPurchaseDate;
+        return mPurchaseDate*1000; //convert to java date in milliseconds
     }
 
     public void setPurchaseDate(long purchaseDate) {
-        mPurchaseDate = purchaseDate;
+        mPurchaseDate = purchaseDate/1000;  //convert to unix date
     }
 
     public long getPurchasePrice() {
